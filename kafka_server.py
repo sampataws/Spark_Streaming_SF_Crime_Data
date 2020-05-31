@@ -1,25 +1,47 @@
-import producer_server
+from configparser import ConfigParser
+from kafka_util import get_logger
+from producer_server import ProducerServer
+from pathlib import Path
 
 
-def run_kafka_server():
-	# TODO get the json file path
-    input_file = ""
 
+
+logger = get_logger(__file__)
+
+KAFKA_CONF_FILE = "sf_application_config.ini"
+INPUT_DATA= Path(__file__).parents[0] / "police-department-calls-for-service.json"
+
+
+def load_config() -> ConfigParser:
+    config = ConfigParser()
+    config.read(KAFKA_CONF_FILE)
+    return config
+
+def run_kafka_producer_server(input_file: str, config: ConfigParser) -> ProducerServer:
     # TODO fill in blanks
-    producer = producer_server.ProducerServer(
+    producer = ProducerServer(
         input_file=input_file,
-        topic="",
-        bootstrap_servers="",
-        client_id=""
+        topic_name=config["kafka"].get("topic"),
+        bootstrap_servers=config["kafka"].get("bootstrap_servers"),
+        client_id=config["kafka"].get("client_id"),
+        num_partitions=config["kafka"].getint("num_partitions"),
+        replication_factor=config["kafka"].getint("replication_factor"),
     )
-
     return producer
 
 
-def feed():
-    producer = run_kafka_server()
-    producer.generate_data()
+def feed_data_to_producer(input_file:str):
+    config = load_config()
+    producer = run_kafka_producer_server(input_file, config)
+    logger.info("Creating Kafka Topic")
+    producer.create_topic()
+    try:
+        logger.info("Calling the generate data function to load data from the JSON file")
+        producer.generate_data()
+    except KeyboardInterrupt:
+        logger.info("Shutting down...")
+        producer.close()
 
 
 if __name__ == "__main__":
-    feed()
+    feed_data_to_producer()
