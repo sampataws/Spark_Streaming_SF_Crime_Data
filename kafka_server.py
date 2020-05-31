@@ -31,6 +31,7 @@ def run_kafka_producer_server(input_file: str, config: ConfigParser) -> Producer
 
 
 def feed_data_to_producer(input_file:str):
+    logger.info("INPUT FILE PATH: {} ".format(INPUT_DATA))
     config = load_config()
     producer = run_kafka_producer_server(input_file, config)
     logger.info("Creating Kafka Topic")
@@ -44,4 +45,4 @@ def feed_data_to_producer(input_file:str):
 
 
 if __name__ == "__main__":
-    feed_data_to_producer()
+    feed_data_to_producer(INPUT_DATA)
