@@ -20,7 +20,11 @@ Analysis of SF crimedata analytics. Below are scripts used to run this project.
 ###Kafka Consumer console output
 ![image](ConsoleConsumerScreenShot.png)
 
+![image](Batch_Output.png)
+
 ![image](SparkUI_Streaming.png)
+
+
 
 
 ##Performance Tunning Questions
